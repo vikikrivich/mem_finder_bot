@@ -2,3 +2,4 @@ aiogram
 supabase
 python-dotenv
 aiohttp-socks
+nltk
