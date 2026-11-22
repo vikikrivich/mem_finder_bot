@@ -26,7 +26,6 @@ class BaseSettings:
         self.CHANNEL_ID = os.getenv("CHANNEL_ID")
         self.PROXY_URL = os.getenv("PROXY_URL")
 
-        # Преобразуем ID пользователя в число, если оно задано в .env
         my_id = os.getenv("MY_TELEGRAM_ID")
         self.MY_TELEGRAM_ID = int(my_id) if my_id and my_id.isdigit() else None
 
