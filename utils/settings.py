@@ -1,46 +1,34 @@
-import logging
 import os
 from dotenv import load_dotenv
 
 
 class BaseSettings:
-    """Base settings class"""
-    ROOT_DIR: str = os.getcwd()
+    """Loads and stores configuration parameters from environment variables."""
 
-    LOGGING_FORMAT: str = "[{asctime}]: {filename:>7}/{lineno:<5} :: {message}"
-    LOGGING_LEVEL_DISPLAY = logging.DEBUG
-    LOGGING_LEVEL_FILESTREAM = logging.WARN
-    LOGGING_FILENAME: str = 'project.log'
+    LOGGING_FILENAME: str = "project.log"
 
     def __init__(self):
+        """Initializes default configuration attributes."""
         self.TOKEN = None
-        self.CHANNEL_ID = None
         self.SUPABASE_URL = None
         self.SUPABASE_KEY = None
+        self.CHANNEL_ID = None
+        self.MY_TELEGRAM_ID = None
         self.PROXY_URL = None
 
-    def load_from_dotenv(self):
-        dotenv_path = os.path.join(self.ROOT_DIR, '.env')
+    def load_from_dotenv(self) -> None:
+        """Reads environment variables from the .env file."""
+        load_dotenv()
 
-        if os.path.exists(dotenv_path):
-            load_dotenv(dotenv_path)
-        else:
-            with open('.env', 'w') as env:
-                env.write(
-                    'TOKEN=\n'
-                    'CHANNEL_ID=\n'
-                    'SUPABASE_URL=\n'
-                    'SUPABASE_KEY=\n'
-                    'PROXY_URL=\n'
-                )
+        self.TOKEN = os.getenv("TOKEN")
+        self.SUPABASE_URL = os.getenv("SUPABASE_URL")
+        self.SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+        self.CHANNEL_ID = os.getenv("CHANNEL_ID")
+        self.PROXY_URL = os.getenv("PROXY_URL")
 
-        self.TOKEN = os.environ.get('TOKEN')
-        self.CHANNEL_ID = os.environ.get('CHANNEL_ID')
-        self.SUPABASE_URL = os.environ.get('SUPABASE_URL')
-        self.SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
-        self.PROXY_URL = os.environ.get('PROXY_URL')
-        
-        return True
+        # Преобразуем ID пользователя в число, если оно задано в .env
+        my_id = os.getenv("MY_TELEGRAM_ID")
+        self.MY_TELEGRAM_ID = int(my_id) if my_id and my_id.isdigit() else None
 
 
 settings = BaseSettings()
