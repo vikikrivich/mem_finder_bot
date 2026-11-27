@@ -68,24 +68,28 @@ def search_memes(supabase: Client, query: str) -> list[dict]:
         """Calculates a relevance score for sorting search results."""
         score = 0
         caption = (item.get("caption") or "").lower()
+        caption_stems = set(extract_stems(caption))
         meme_tag_stems = {stem_word(t) for t in (item.get("tags") or []) if t}
 
-        # Бонус за точное вхождение всей фразы целиком
-        if clean_query in caption:
+        # Если ни один стем не совпал как целое слово — отбрасываем мусор
+        matched_stems = len(query_stems_set.intersection(caption_stems))
+        matched_tags = len(query_stems_set.intersection(meme_tag_stems))
+
+        if matched_stems == 0 and matched_tags == 0:
+            return 0
+
+        if re.search(rf"\b{re.escape(clean_query)}\b", caption):
             score += 100
 
-        # Баллы за каждый найденный корень слова в описании
-        matched_stems = sum(1 for stem in query_stems if stem in caption)
         score += matched_stems * 5
-
-        # Бонус, если в описании нашлись вообще все слова из запроса
-        if matched_stems == len(query_stems):
+        if matched_stems == len(query_stems_set):
             score += 25
 
-        # Баллы за совпадение с тегами мема
-        score += len(query_stems_set.intersection(meme_tag_stems)) * 8
+        score += matched_tags * 8
         return score
 
     # Сортируем найденные мемы от самых релевантных к менее подходящим
-    items.sort(key=calculate_score, reverse=True)
-    return items[:50]
+    scored_items = [(calculate_score(item), item) for item in items]
+    scored_items = [pair for pair in scored_items if pair[0] > 0]
+    scored_items.sort(key=lambda x: x[0], reverse=True)
+    return [item for _, item in scored_items[:50]]
