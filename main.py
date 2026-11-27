@@ -32,7 +32,6 @@ async def main():
     @dp.message(Command("start"))
     async def cmd_start(message: types.Message):
         """Sends a welcome message with bot usage instructions."""
-        # Логируем факт запуска бота пользователем
         user = message.from_user
         logger.info(f"User {user.id} (@{user.username}) sent /start")
 
@@ -46,7 +45,6 @@ async def main():
     @dp.message(Command("random"))
     async def cmd_random(message: types.Message):
         """Fetches and sends a random meme to the chat."""
-        # Логируем запрос случайного мема
         user = message.from_user
         logger.info(f"User {user.id} (@{user.username}) requested /random")
 
@@ -74,7 +72,6 @@ async def main():
                 pass
             return
 
-        # Логируем сам поисковый запрос пользователя
         logger.info(f"Inline query from {user.id} (@{user.username}): '{query}'")
 
         # Обработка запроса случайного мема в инлайн-режиме
